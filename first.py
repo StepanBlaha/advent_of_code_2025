@@ -1,4 +1,3 @@
-import math
 def partOne():
     temp = 50
     count = 0
@@ -73,4 +72,5 @@ def partTwo():
 
 
 if __name__ == "__main__":
+    partOne();
     partTwo()
