@@ -1,183 +1,75 @@
-import numpy as pd # Hihi
-
-exampleGrid = [
-        [".", ".", "@", "@", ".", "@", "@", "@", "@", "."],
-        ["@", "@", "@", ".", "@", ".", "@", ".", "@", "@"],
-        ["@", "@", "@", "@", "@", ".", "@", ".", "@", "@"],
-        ["@", ".", "@", "@", "@", "@", ".", ".", "@", "."],
-        ["@", "@", ".", "@", "@", "@", "@", ".", "@", "@"],
-        [".", "@", "@", "@", "@", "@", "@", "@", ".", "@"],
-        [".", "@", ".", "@", ".", "@", ".", "@", "@", "@"],
-        ["@", ".", "@", "@", "@", ".", "@", "@", "@", "@"],
-        [".", "@", "@", "@", "@", "@", "@", "@", "@", "."],
-        ["@", ".", "@", ".", "@", "@", "@", ".", "@", "."],
-    ]
-
-
-# Read file into 2d grid
-def readFile(path):
-    filename = path
-
-    with open(filename, "r", encoding="utf-8") as f:
-        # 2) Build a 2D list (list of rows, each row = list of chars)
-        grid = [list(line.rstrip("\n")) for line in f]
-
-    # Now `grid` is a 2D array of characters
-    # Example: access row 0, col 3:
-    print(grid[0][3])
-
-    # Print dimensions
-    rows = len(grid)
-    cols = len(grid[0]) if rows > 0 else 0
-    print("Rows:", rows, "Cols:", cols)
-
-    npGrid = pd.array(grid)
-    return npGrid
-
-
-
-
-
-def partOne():
-    grid = readFile("boxes.txt")
-    sampleGrid = [
-    ['.', '.', '.', '.', '.', '.', '.', 'S', '.', '.', '.', '.', '.', '.', '.'],
-    ['.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.'],
-    ['.', '.', '.', '.', '.', '.', '.', '^', '.', '.', '.', '.', '.', '.', '.'],
-    ['.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.'],
-    ['.', '.', '.', '.', '.', '.', '^', '.', '^', '.', '.', '.', '.', '.', '.'],
-    ['.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.'],
-    ['.', '.', '.', '.', '.', '^', '.', '^', '.', '^', '.', '.', '.', '.', '.'],
-    ['.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.'],
-    ['.', '.', '.', '.', '^', '.', '^', '.', '.', '.', '^', '.', '.', '.', '.'],
-    ['.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.'],
-    ['.', '.', '.', '^', '.', '^', '.', '.', '.', '^', '.', '^', '.', '.', '.'],
-    ['.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.'],
-    ['.', '.', '^', '.', '.', '.', '^', '.', '.', '.', '.', '.', '^', '.', '.'],
-    ['.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.'],
-    ['.', '^', '.', '^', '.', '^', '.', '^', '.', '^', '.', '.', '.', '^', '.'],
-    ['.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.'],
-]
-
-
-    count = 0
-    targetedRows = []
-    connections = [
-
-    ]
-
-
-    for i in range(len(grid)):
-        target = pd.array(grid[i])
-        newGrid = grid
-        newGrid.pop(i)
-
-        ## Get distances
-        diffs = newGrid - target
-        # Calculate
-        distances_sq = pd.sum(diffs**2, axis=1)
-        # Get the smallest distance index
-        closest_index = pd.argmin(distances_sq)
-        # Get the closest point values
-        closest_point = grid[closest_index]
-
-
-
-        
-    
-
-
-
-    print(count)
-
-
-def partTwo():
-    grid = readFile("beams.txt")
-    sampleGrid = [
-        ['.', '.', '.', '.', '.', '.', '.', 'S', '.', '.', '.', '.', '.', '.', '.'],
-        ['.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.'],
-        ['.', '.', '.', '.', '.', '.', '.', '^', '.', '.', '.', '.', '.', '.', '.'],
-        ['.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.'],
-        ['.', '.', '.', '.', '.', '.', '^', '.', '^', '.', '.', '.', '.', '.', '.'],
-        ['.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.'],
-        ['.', '.', '.', '.', '.', '^', '.', '^', '.', '^', '.', '.', '.', '.', '.'],
-        ['.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.'],
-        ['.', '.', '.', '.', '^', '.', '^', '.', '.', '.', '^', '.', '.', '.', '.'],
-        ['.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.'],
-        ['.', '.', '.', '^', '.', '^', '.', '.', '.', '^', '.', '^', '.', '.', '.'],
-        ['.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.'],
-        ['.', '.', '^', '.', '.', '.', '^', '.', '.', '.', '.', '.', '^', '.', '.'],
-        ['.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.'],
-        ['.', '^', '.', '^', '.', '^', '.', '^', '.', '^', '.', '.', '.', '^', '.'],
-        ['.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.'],
-    ]
-
-    # Count rows and columns
-    rows = len(grid)
-    cols = len(grid[0])
-
-    # Array with the same sizes as grid, each position will be number of how many timelines have beam at that position
-    dp = [[0] * cols for _ in range(rows)]
-
-    # Find S in the first row
-    start_col = grid[0].index('S')
-    dp[0][start_col] = 1
-
-    # Number of finished timelines
-    finished = 0
-
-    # Go over each row
-    for r in range(rows):
-        # Go over each column
-        for c in range(cols):
-            # How many timelines havee beam
-            cnt = dp[r][c]
-            if cnt == 0:
+def read_boxes(path: str):
+    points = []
+    with open(path, "r", encoding="utf-8") as f:
+        for line in f:
+            line = line.strip()
+            if not line:
                 continue
+            x, y, z = map(int, line.split(","))
+            points.append((x, y, z))
+    return points
 
-            # If we're on the last row, next step would exit the bottom
-            if r == rows - 1:
-                finished += cnt
-                continue
 
-            # Rows under exist
-            below = grid[r + 1][c]
+class DSU:
+    def __init__(self, n: int):
+        self.parent = list(range(n))
+        self.size = [1] * n
 
-            if below == '.':
-                # Particle just continues straight down
-                dp[r + 1][c] += cnt
-            elif below == '^':
-                # Splitter: time splits into left and right branches
+    def find(self, x: int) -> int:
+        if self.parent[x] != x:
+            self.parent[x] = self.find(self.parent[x])
+        return self.parent[x]
 
-                # Left branch
-                if c - 1 >= 0:
-                    dp[r + 1][c - 1] += cnt
-                else:
-                    # Falls off the left side
-                    finished += cnt
+    def union(self, a: int, b: int):
+        ra = self.find(a)
+        rb = self.find(b)
+        if ra == rb:
+            return
+        if self.size[ra] < self.size[rb]:
+            ra, rb = rb, ra
+        self.parent[rb] = ra
+        self.size[ra] += self.size[rb]
 
-                # Right branch
-                if c + 1 < cols:
-                    dp[r + 1][c + 1] += cnt
-                else:
-                    # Falls off the right side
-                    finished += cnt
 
-    print(finished)
+def part_one(path: str, k_connections: int = 1000) -> int:
+    points = read_boxes(path)
+    n = len(points)
 
+    # Build all pairwise distances (squared)
+    pairs = []
+    for i in range(n):
+        x1, y1, z1 = points[i]
+        for j in range(i + 1, n):
+            x2, y2, z2 = points[j]
+            dx = x1 - x2
+            dy = y1 - y2
+            dz = z1 - z2
+            dist_sq = dx * dx + dy * dy + dz * dz
+            pairs.append((dist_sq, i, j))
+
+    # Sort by distance
+    pairs.sort(key=lambda t: t[0])
+
+    dsu = DSU(n)
+
+    # Connect the k shortest pairs
+    for idx in range(min(k_connections, len(pairs))):
+        _, i, j = pairs[idx]
+        dsu.union(i, j)
+
+    # Compute component sizes
+    comp_sizes = {}
+    for i in range(n):
+        root = dsu.find(i)
+        comp_sizes[root] = comp_sizes.get(root, 0) + 1
+
+    sizes = sorted(comp_sizes.values(), reverse=True)
+    if len(sizes) < 3:
+        raise ValueError("Less than 3 circuits – unexpected for real input")
+
+    return sizes[0] * sizes[1] * sizes[2]
 
 
 if __name__ == "__main__":
-    partOne()
-
-
-
-
-
-
-
-
-
-
-
-
+    result = part_one("boxes.txt", 1000)
+    print(result)
