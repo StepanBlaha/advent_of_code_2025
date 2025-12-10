@@ -20,22 +20,24 @@ class DSU:
             self.parent[x] = self.find(self.parent[x])
         return self.parent[x]
 
-    def union(self, a: int, b: int):
+    def union(self, a: int, b: int) -> bool:
+        """Union sets containing a and b.
+        Returns True if a merge actually happened, False if they were already connected.
+        """
         ra = self.find(a)
         rb = self.find(b)
         if ra == rb:
-            return
+            return False
         if self.size[ra] < self.size[rb]:
             ra, rb = rb, ra
         self.parent[rb] = ra
         self.size[ra] += self.size[rb]
+        return True
 
 
-def part_one(path: str, k_connections: int = 1000) -> int:
-    points = read_boxes(path)
+def build_sorted_pairs(points):
+    """Return list of (dist_sq, i, j) sorted by distance."""
     n = len(points)
-
-    # Build all pairwise distances (squared)
     pairs = []
     for i in range(n):
         x1, y1, z1 = points[i]
@@ -46,10 +48,15 @@ def part_one(path: str, k_connections: int = 1000) -> int:
             dz = z1 - z2
             dist_sq = dx * dx + dy * dy + dz * dz
             pairs.append((dist_sq, i, j))
-
-    # Sort by distance
     pairs.sort(key=lambda t: t[0])
+    return pairs
 
+
+def part_one(path: str, k_connections: int = 1000) -> int:
+    points = read_boxes(path)
+    n = len(points)
+
+    pairs = build_sorted_pairs(points)
     dsu = DSU(n)
 
     # Connect the k shortest pairs
@@ -70,6 +77,43 @@ def part_one(path: str, k_connections: int = 1000) -> int:
     return sizes[0] * sizes[1] * sizes[2]
 
 
+def part_two(path: str) -> int:
+    points = read_boxes(path)
+    n = len(points)
+
+    pairs = build_sorted_pairs(points)
+    dsu = DSU(n)
+
+    components = n
+    last_merge_pair = None  # store indices (i, j) of the last actual merge
+
+    for _, i, j in pairs:
+        # Only count pairs that actually join two different circuits
+        merged = dsu.union(i, j)
+        if not merged:
+            continue
+
+        last_merge_pair = (i, j)
+        components -= 1
+
+        if components == 1:
+            # All junction boxes are now in one single circuit
+            break
+
+    if last_merge_pair is None:
+        raise ValueError("Graph was already connected or no merges happened")
+
+    i, j = last_merge_pair
+    x1, _, _ = points[i]
+    x2, _, _ = points[j]
+
+    return x1 * x2
+
+
 if __name__ == "__main__":
-    result = part_one("boxes.txt", 1000)
-    print(result)
+    path = "boxes.txt"
+    result1 = part_one(path, 1000)
+    print("Part 1:", result1)
+
+    result2 = part_two(path)
+    print("Part 2:", result2)
